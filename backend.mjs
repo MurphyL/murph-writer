@@ -19,7 +19,7 @@ const store = new DataBase({
 });
 
 app.get('/books', (req, res) => {
-    store.find({ kind: 'book' }, function (err, docs) {
+    store.find({ kind: 'book' }).sort({ ts: 1 }).limit(10).exec((err, docs) => {
         if (err) {
             console.error(err);
             return res.json({
@@ -68,7 +68,7 @@ app.post('/books', (req, res) => {
             res.send({ code: 0, payload: { _id, count } });
         });
     } else {
-        store.insert([req.body || {}], function (err) {
+        store.insert([{...book, ts: Date.now()}], function (err) {
             if (err) {
                 console.error(err);
                 return res.json({
