@@ -1,10 +1,17 @@
 <script context="module">
+    import Info from '../plug/book/features/info.feature.svelte';
+    import Item from '../plug/book/features/item.feature.svelte';
+    import Map from '../plug/book/features/map.feature.svelte';
+    import Skill from '../plug/book/features/skill.feature.svelte';
+    import Timeline from '../plug/book/features/timeline.feature.svelte';
+
     const url = "http://localhost:7501/books";
 
     const [ NAME, COMPONENT ] = [ 0, 1 ];
 
     const features = {
         info: ["信息", Info],
+        timeline: ["时间轴", Timeline],
         map: [ "地图", Map ],
         skill: [ "技能",  Skill ],
         item: [ "物品", Item ],
@@ -14,10 +21,7 @@
 <script>
     import { ajax } from "../utils/global.utils.svelte";
 
-    import Info from '../plug/book/features/info.feature.svelte';
-    import Item from '../plug/book/features/item.feature.svelte';
-    import Map from '../plug/book/features/map.feature.svelte';
-    import Skill from '../plug/book/features/skill.feature.svelte';
+
 
     export let unique;
     export let feature = 'info';
@@ -38,6 +42,7 @@
                 </div>
                 <div class="features">
                     <a href="/books/{unique}/info" class:active={feature === 'info'}>{features['info'][NAME]}</a>
+                    <a href="/books/{unique}/timeline" class:active={feature === 'timeline'}>{features['timeline'][NAME]}</a>
                     {#each (book.features || []) as key}
                         <a href="/books/{unique}/{key}" class:active={feature === key}>{features[key][NAME]}</a>
                     {/each}

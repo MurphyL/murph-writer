@@ -34,7 +34,11 @@
             .then(createCancel)
             .catch(e => { alert(e.message) });
     };
-
+    const deleteBook = (_id) => {
+        ajax(['delete', `${url}/${_id}`])
+            .then(createCancel)
+            .catch(e => { alert(e.message) });
+    };
 </script>
 
 <svelte:head>
@@ -76,7 +80,7 @@
                                 <td>{ row.summary }</td>
                                 <td>
                                     <button on:click={ () => { params = row; showCreate = true; } }>修改</button>
-                                    <button on:click={ () => { ajax(['delete', `${url}/${row.unique}`])} }>删除</button>
+                                    <button on:click={ () => deleteBook(row._id) }>删除</button>
                                 </td>
                             </tr>
                         {/if}

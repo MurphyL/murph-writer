@@ -19,7 +19,7 @@ const store = new DataBase({
 });
 
 app.get('/books', (req, res) => {
-    store.find({}, function (err, docs) {
+    store.find({ kind: 'book' }, function (err, docs) {
         if (err) {
             console.error(err);
             return res.json({
@@ -31,7 +31,7 @@ app.get('/books', (req, res) => {
 });
 
 app.get('/books/:unique', (req, res) => {
-    store.findOne(req.params, function (err, doc) {
+    store.findOne({ ...req.params, kind: 'book' }, function (err, doc) {
         if (err) {
             console.error(err);
             return res.json({
@@ -43,21 +43,29 @@ app.get('/books/:unique', (req, res) => {
 });
 
 
-app.delete('/books/:unique', (req, res) => {
-    res.json({code: 0, test: ture, params: req.params });
+app.delete('/books/:_id', (req, res) => {
+    store.remove({ ...req.params, kind: 'book' }, {}, function (err, count) {
+        if (err) {
+            return res.json({
+                code: 1, message: '数据删除失败'
+            });
+        }
+        res.json({code: 0, payload: { ...req.params, count } });
+    });
 });
 
 app.post('/books', (req, res) => {
     const { _id, ...book } = req.body;
+    Object.assign(book, { kind: 'book' });
     if(_id) {
-        store.update({ _id }, book, {}, function (err) {
+        store.update({ _id }, book, {}, function (err, count) {
             if (err) {
                 console.error(err);
                 return res.json({
                     code: 1, message: '数据更新失败！'
                 });
             }
-            res.send({ code: 0, message: '' });
+            res.send({ code: 0, payload: { _id, count } });
         });
     } else {
         store.insert([req.body || {}], function (err) {
