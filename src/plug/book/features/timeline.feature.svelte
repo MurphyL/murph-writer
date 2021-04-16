@@ -15,6 +15,7 @@
     let ts = Date.now();
 
     const save = (e, sort, _id) => {
+        console.log(e, sort, _id);
         if (e.code === "Enter" && e.ctrlKey) {
             e.preventDefault();
             ajax([ "post", "/events", {
@@ -38,9 +39,11 @@
             <div>Loading...</div>
         {:then events}
             {#each events as { _id, content }, index}
-                <div class="event saved" contenteditable data-row-index={index + 1} on:keydown={(e) => save(e, index, _id)} bind:textContent={content}/>
+                <div class="event saved" contenteditable data-row-index={index + 1} on:keydown={(e) => save(e, index, _id)}>
+                    {content}
+                </div>
             {/each}
-            <div contenteditable class="event create" on:keydown={(e) => save(e, events.length)}>创建事件</div>
+            <div class="event create" contenteditable on:keydown={(e) => save(e, events.length)}>创建事件</div>
         {:catch error}
             <div>Error: {error.message}</div>
         {/await}
