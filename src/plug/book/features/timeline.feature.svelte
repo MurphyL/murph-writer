@@ -15,7 +15,6 @@
     let ts = Date.now();
 
     const save = (e, _id) => {
-        console.log(e, _id);
         if (e.code === "Enter" && e.ctrlKey) {
             e.preventDefault();
             ajax([ "post", "/events", {
@@ -23,7 +22,6 @@
                     content: (e.target.textContent || '').trim(),
             }]).then(() => {
                 ts = Date.now();
-                e.target.blur();
             });
         }
         focus(e);
@@ -50,7 +48,7 @@
                 if(index === i) {
                     items.push({ 
                         sort: items.length,
-                        content: `新建事件 - ${Date.now()}` 
+                        content: `新技能 - ${Date.now()}` 
                     });
                 }
                 items.push({ sort: items.length, _id });
@@ -59,7 +57,7 @@
                 if(index === i) {
                     items.push({ 
                         sort: items.length,
-                        content: `新建事件 - ${Date.now()}` 
+                        content: `新技能 - ${Date.now()}` 
                     });
                 }
             }
@@ -80,18 +78,30 @@
         {#await ajax(["get", '/events'])}
             <div>Loading...</div>
         {:then events}
-            {#each events as { _id, content }, index}
-                <div class="event" data-row-index={index + 1}>
-                    <div class="editor" contenteditable on:focus={(e) => focus(e, index)} on:keydown={(e) => save(e, _id)}>{content}</div>
+            {#if events.length > 0}
+                {#each events as { _id, content }, index}
+                    <div class="event" data-row-index={index + 1}>
+                        <div class="editor" contenteditable on:focus={(e) => focus(e, index)} on:keydown={(e) => save(e, _id)}>{content}</div>
+                        <div class="toolbar">
+                            <div class="wrapper">
+                                <span>按快捷键【Ctrl + Enter】保存</span>
+                                <button on:click={() => appendEvent(events, index, 0)}>前置</button>
+                                <button on:click={() => appendEvent(events, index, 1)}>追加</button>
+                                <button on:click={() => deleteEvent(_id)}>删除</button>
+                            </div>
+                        </div>
+                    </div>
+                {/each}
+            {:else}
+                <div class="event current">
+                    <div class="editor current" contenteditable on:keydown={(e) => save(e)}>创建新事件</div>
                     <div class="toolbar">
                         <div class="wrapper">
-                            <button on:click={() => appendEvent(events, index, 0)}>前置</button>
-                            <button on:click={() => appendEvent(events, index, 1)}>追加</button>
-                            <button on:click={() => deleteEvent(_id)}>删除</button>
+                            <span>按快捷键【Ctrl + Enter】保存</span>
                         </div>
                     </div>
                 </div>
-            {/each}
+            {/if}
         {:catch error}
             <div>Error: {error.message}</div>
         {/await}
