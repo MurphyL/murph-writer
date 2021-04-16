@@ -58,7 +58,7 @@
                 <thead>
                     <th width="10%">ID</th>
                     <th width="10%">标题</th>
-                    <th width="10%">特征</th>
+                    <th width="10%">可选特征</th>
                     <th width="10%">备注</th>
                     <th width="10%">操作</th>
                 </thead>

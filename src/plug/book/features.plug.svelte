@@ -1,6 +1,7 @@
 <script context="module">
     import * as EditorFeature from "./features/editor.feature.svelte";
     import * as ItemFeature from "./features/item.feature.svelte";
+    import * as RoleFeature from "./features/role.feature.svelte";
     import * as MapFeature from "./features/map.feature.svelte";
     import * as SkillFeature from "./features/skill.feature.svelte";
     import * as TimelineFeature from "./features/timeline.feature.svelte";
@@ -9,6 +10,7 @@
     const features = [
         EditorFeature,
         ItemFeature,
+        RoleFeature,
         MapFeature,
         SkillFeature,
         TimelineFeature,
