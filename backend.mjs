@@ -19,7 +19,7 @@ const store = new DataBase({
 });
 
 app.get('/:kind', (req, res) => {
-    store.find(req.params).sort({ ts: 1 }).limit(10).exec((err, docs) => {
+    store.find(req.params).sort({ sort: 1 }).limit(10).exec((err, docs) => {
         if (err) {
             console.error(err);
             return res.json({
@@ -44,7 +44,7 @@ app.get('/:kind/:unique', (req, res) => {
 
 
 app.delete('/:kind/:_id', (req, res) => {
-    store.remove({ ...req.params, kind: 'books' }, {}, function (err, count) {
+    store.remove({ ...req.params }, {}, function (err, count) {
         if (err) {
             return res.json({
                 code: 1, message: '数据删除失败'
@@ -58,7 +58,7 @@ app.post('/:kind', (req, res) => {
     const { _id, ...item } = req.body;
     Object.assign(item, req.params);
     if(_id) {
-        store.update({ _id }, item, {}, function (err, count) {
+        store.update({ _id }, { $set: item }, {}, function (err, count) {
             if (err) {
                 console.error(err);
                 return res.json({
@@ -68,7 +68,8 @@ app.post('/:kind', (req, res) => {
             res.send({ code: 0, payload: { _id, count } });
         });
     } else {
-        store.insert([{...item, ts: Date.now()}], function (err) {
+        const ts = Date.now();
+        store.insert([{...item, sort: ts, ts}], function (err) {
             if (err) {
                 console.error(err);
                 return res.json({
@@ -78,7 +79,33 @@ app.post('/:kind', (req, res) => {
             res.send({ code: 0 });
         });
     }
+});
 
+app.post('/:kind/append', (req, res) => {
+    const { kind } = req.params;
+    (req.body || []).forEach(({ _id, sort, content }) => {
+        const ts = Date.now();
+        if(_id) {
+            store.update({ _id }, { $set: { sort, ts } }, {}, (err) => {
+                if (err) {
+                    console.error(err);
+                    return res.json({
+                        code: 1, message: '数据更新失败！'
+                    });
+                }
+            });
+        } else {
+            store.insert([{ kind, content, ts, sort }], (err) => {
+                if (err) {
+                    console.error(err);
+                    return res.json({
+                        code: 1, message: '数据插入失败！'
+                    });
+                }
+            });
+        }
+    });
+    res.json({ code: 0 });
 });
 
 app.listen(port, () => {

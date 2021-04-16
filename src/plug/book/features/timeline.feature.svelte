@@ -14,18 +14,60 @@
 
     let ts = Date.now();
 
-    const save = (e, sort, _id) => {
-        console.log(e, sort, _id);
+    const save = (e, _id) => {
+        console.log(e, _id);
         if (e.code === "Enter" && e.ctrlKey) {
             e.preventDefault();
             ajax([ "post", "/events", {
-                    _id, sort,
+                    _id,
                     content: (e.target.textContent || '').trim(),
             }]).then(() => {
                 ts = Date.now();
                 e.target.blur();
             });
         }
+        focus(e);
+    };
+
+    const focus = (e) => {
+        Array.from(document.querySelectorAll('.timeline .event')).forEach(item => {
+            item.classList.remove("current");
+        });
+        e.target.parentElement.classList.add("current");
+    };
+
+    const deleteEvent = (_id) => {
+        ajax(['delete', `/events/${_id}`])
+            .then(() => {
+                ts = Date.now();
+            });
+    }
+
+    const appendEvent = (events, index, flag) => {
+        const items = [];
+        (events || []).forEach(({ _id }, i) => {
+            if(flag === 0) {
+                if(index === i) {
+                    items.push({ 
+                        sort: items.length,
+                        content: `新建事件 - ${Date.now()}` 
+                    });
+                }
+                items.push({ sort: items.length, _id });
+            } else {
+                items.push({ sort: items.length, _id });
+                if(index === i) {
+                    items.push({ 
+                        sort: items.length,
+                        content: `新建事件 - ${Date.now()}` 
+                    });
+                }
+            }
+        });
+        ajax(['post', `/events/append`, items])
+            .then(() => {
+                ts = Date.now();
+            });
     };
 </script>
 
@@ -35,15 +77,21 @@
 
 <div class="timeline">
     {#key ts}
-        {#await ajax(["get", `/events`])}
+        {#await ajax(["get", '/events'])}
             <div>Loading...</div>
         {:then events}
             {#each events as { _id, content }, index}
-                <div class="event saved" contenteditable data-row-index={index + 1} on:keydown={(e) => save(e, index, _id)}>
-                    {content}
+                <div class="event" data-row-index={index + 1}>
+                    <div class="editor" contenteditable on:focus={(e) => focus(e, index)} on:keydown={(e) => save(e, _id)}>{content}</div>
+                    <div class="toolbar">
+                        <div class="wrapper">
+                            <button on:click={() => appendEvent(events, index, 0)}>前置</button>
+                            <button on:click={() => appendEvent(events, index, 1)}>追加</button>
+                            <button on:click={() => deleteEvent(_id)}>删除</button>
+                        </div>
+                    </div>
                 </div>
             {/each}
-            <div class="event create" contenteditable on:keydown={(e) => save(e, events.length)}>创建事件</div>
         {:catch error}
             <div>Error: {error.message}</div>
         {/await}
@@ -51,31 +99,53 @@
 </div>
 
 <style>
+    .timeline {
+        position: relative;
+    }
     .timeline .event {
-        margin: 10px;
-        padding: 3px 5px;
+        position: relative;
+        margin: 10px 10px 10px 50px;
+        line-height: 20px;
     }
     .timeline .event::before {
         display: inline-block;
+        position: absolute;
+        top: 3px;
+        left: -40px;
         margin-right: 10px;
         width: 35px;
         color: grey;
         text-align: right;
+        line-height: 22px;
     }
-    .timeline .event:focus {
-        outline: #cfcfcf auto 1px;
-    }
-    .timeline .event.create {
-        color: grey;
-    }
-    .timeline .event.saved::before {
+    .timeline .event::before {
         content: attr(data-row-index);
     }
-    .timeline .event.create::before {
-        content: "NEW";
-        font-size: 12px;
+    .timeline .event .editor {
+        padding: 3px 5px;
+        outline: none;
+        border: 1px solid #fff;
     }
-    .timeline .event.create:focus {
-        color: #000;
+    .timeline .event.current .editor {
+        border: 1.3px solid #cfcfcf;
+    }
+    .timeline .event .toolbar {
+        position: absolute;
+        right: 0;
+        line-height: 25px;
+        visibility: hidden;
+        text-align: right;
+        background: #ffffff;
+        border: 1.3px solid #cfcfcf;
+        border-top: none;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        z-index: 999;
+    }
+    .timeline .event.current .toolbar {
+        visibility: visible; 
+    }
+    .timeline .event .toolbar .wrapper {
+        padding: 5px 8px;
     }
 </style>

@@ -1,5 +1,4 @@
 import { config } from 'dotenv';
-import json from '@rollup/plugin-json';
 import css from 'rollup-plugin-css-only';
 import svelte from 'rollup-plugin-svelte';
 import replace from '@rollup/plugin-replace';
@@ -60,7 +59,6 @@ export default {
             dedupe: ['svelte']
         }),
         commonjs(),
-        json(),
         replace({
             preventAssignment: true,
             exclude: [ 'node_modules', 'public' ],
