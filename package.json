@@ -31,7 +31,5 @@
     "sveltestrap": "^3.14.0",
     "tinro": "^0.6.1"
   },
-  "dependencies": {
-    "wired-elements": "^2.1.2"
-  }
+  "dependencies": {}
 }

@@ -1,6 +1,8 @@
 <script>
     import { title, ajax } from "../utils/global.utils.svelte";
 
+    import { getSampleFeatures } from '../plug/book/features.plug.svelte';
+
     let showCreate = false;
 
     let ts = Date.now();
@@ -15,8 +17,6 @@
         features: []
     };
 
-    const url = "http://localhost:7501/books";
-
     const createCancel = () => {
         showCreate = false;
         Object.keys(params).forEach((key) => {
@@ -30,12 +30,12 @@
         if(!params.unique || !params.title) {
             return alert('【故事的全局ID】和【给故事取个名字】必须填写');
         }
-        ajax(['post', url, (params || {})])
+        ajax(['post', '/books', (params || {})])
             .then(createCancel)
             .catch(e => { alert(e.message) });
     };
     const deleteBook = (_id) => {
-        ajax(['delete', `${url}/${_id}`])
+        ajax(['delete', `/books/${_id}`])
             .then(createCancel)
             .catch(e => { alert(e.message) });
     };
@@ -51,7 +51,7 @@
         <button disabled={showCreate} on:click={() => (showCreate = true)}>新增故事</button>
     </div>
     {#key ts}
-        {#await ajax(['get', url])}
+        {#await ajax(['get', '/books'])}
             <p>数据加载中……</p>
         {:then rows}
             <table class="book-list">
@@ -72,8 +72,8 @@
                                 <td>{ row.title }</td>
                                 <td>
                                     <div class="features">
-                                        {#each (row.features || []) as feature, i }
-                                            <span class="feature">{features[feature]}</span>
+                                        {#each getSampleFeatures(row.features) as feature, i }
+                                            <span class="feature">{feature.name}</span>
                                         {/each}
                                     </div>
                                 </td>

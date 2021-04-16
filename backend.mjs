@@ -18,8 +18,8 @@ const store = new DataBase({
     autoload: true
 });
 
-app.get('/books', (req, res) => {
-    store.find({ kind: 'book' }).sort({ ts: 1 }).limit(10).exec((err, docs) => {
+app.get('/:kind', (req, res) => {
+    store.find(req.params).sort({ ts: 1 }).limit(10).exec((err, docs) => {
         if (err) {
             console.error(err);
             return res.json({
@@ -30,8 +30,8 @@ app.get('/books', (req, res) => {
     });
 });
 
-app.get('/books/:unique', (req, res) => {
-    store.findOne({ ...req.params, kind: 'book' }, function (err, doc) {
+app.get('/:kind/:unique', (req, res) => {
+    store.findOne(req.params, function (err, doc) {
         if (err) {
             console.error(err);
             return res.json({
@@ -43,8 +43,8 @@ app.get('/books/:unique', (req, res) => {
 });
 
 
-app.delete('/books/:_id', (req, res) => {
-    store.remove({ ...req.params, kind: 'book' }, {}, function (err, count) {
+app.delete('/:kind/:_id', (req, res) => {
+    store.remove({ ...req.params, kind: 'books' }, {}, function (err, count) {
         if (err) {
             return res.json({
                 code: 1, message: '数据删除失败'
@@ -54,11 +54,11 @@ app.delete('/books/:_id', (req, res) => {
     });
 });
 
-app.post('/books', (req, res) => {
-    const { _id, ...book } = req.body;
-    Object.assign(book, { kind: 'book' });
+app.post('/:kind', (req, res) => {
+    const { _id, ...item } = req.body;
+    Object.assign(item, req.params);
     if(_id) {
-        store.update({ _id }, book, {}, function (err, count) {
+        store.update({ _id }, item, {}, function (err, count) {
             if (err) {
                 console.error(err);
                 return res.json({
@@ -68,7 +68,7 @@ app.post('/books', (req, res) => {
             res.send({ code: 0, payload: { _id, count } });
         });
     } else {
-        store.insert([{...book, ts: Date.now()}], function (err) {
+        store.insert([{...item, ts: Date.now()}], function (err) {
             if (err) {
                 console.error(err);
                 return res.json({

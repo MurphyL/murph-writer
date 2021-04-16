@@ -13,8 +13,14 @@
         return `${name || "未命名页面"} | ${env("APP_TITLE")}`;
     };
 
+    const instance = axios.create({
+        baseURL: env('AJAX_ROOT'),
+        timeout: 1000,
+        headers: {'X-Custom-Header': 'foobar'}
+    });
+
     export const ajax = ([method = "get", url, params]) => {
-        return axios({ method, url, data: params }).then(
+        return instance({ method, url, data: params }).then(
             ({ data: { code, payload, message }, status }) => {
                 if (status === 200 && code === 0) {
                     return payload;

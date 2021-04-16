@@ -1,69 +1,45 @@
-<script context="module">
-    import Info from '../plug/book/features/info.feature.svelte';
-    import Item from '../plug/book/features/item.feature.svelte';
-    import Map from '../plug/book/features/map.feature.svelte';
-    import Skill from '../plug/book/features/skill.feature.svelte';
-    import Timeline from '../plug/book/features/timeline.feature.svelte';
-
-    const url = "http://localhost:7501/books";
-
-    const [ NAME, COMPONENT ] = [ 0, 1 ];
-
-    const features = {
-        info: ["信息", Info],
-        timeline: ["时间轴", Timeline],
-        map: [ "地图", Map ],
-        skill: [ "技能",  Skill ],
-        item: [ "物品", Item ],
-    };
-</script>
-
 <script>
+    import { getTopFeatures, getFeatureComponent } from "../plug/book/features.plug.svelte";
     import { ajax } from "../utils/global.utils.svelte";
 
-
-
     export let unique;
-    export let feature = 'info';
+    export let feature = 'editor';
+
 </script>
 
 <div class="book-info">
-    {#await ajax(['get', `${url}/${unique}`])}
+    {#await ajax(['get', `/books/${unique}`])}
         <p>数据加载中……</p>
     {:then book}
-        {#if features[feature]}
-            <header class="navi">
-                <div class="breadcrumb">
-                    <a href="/books">列表</a>
-                    <span>/</span>
-                    <a href="/books/{unique}">{book.title || '未命名书籍'}</a>
-                    <span>/</span>
-                    <span>{features[feature][NAME]}</span>
-                </div>
-                <div class="features">
-                    <a href="/books/{unique}/info" class:active={feature === 'info'}>{features['info'][NAME]}</a>
-                    <a href="/books/{unique}/timeline" class:active={feature === 'timeline'}>{features['timeline'][NAME]}</a>
-                    {#each (book.features || []) as key}
-                        <a href="/books/{unique}/{key}" class:active={feature === key}>{features[key][NAME]}</a>
-                    {/each}
-                </div>
-            </header>
-            <div class="board">
-                <div class="tab-body">
-                    <svelte:component this={features[feature][COMPONENT]} book={book}/>
-                </div>
+        <header class="navi">
+            <div class="breadcrumb">
+                <a href="/books">列表</a>
+                <span>/</span>
+                <a href="/books/{unique}">{book.title || '未命名书籍'}</a>
             </div>
-        {:else}
-            <div>出错了？ feature = {feature}</div>
-        {/if}
+            <div class="features">
+                {#each getTopFeatures(book.features) as { unique: key, shortname }}
+                    <a href="/books/{unique}/{key}" class:active={feature === key}>{shortname}</a>
+                {/each}
+            </div>
+        </header>
+        <div class="board">
+            <div class="tab-body">
+                <svelte:component this={getFeatureComponent(feature)} book={book}/>
+            </div>
+        </div>
     {:catch error}
         <p>数据加载出错：{error.message}</p>
     {/await}
 </div>
 
 <style>
+    .book-info {
+        height: 100%;
+    }
     .book-info .navi {
         display: flex;
+        padding: 5px;
         line-height: 30px;
     }
     .book-info .navi .features {
@@ -72,5 +48,8 @@
     }
     .book-info .navi .features a {
         padding: 0 10px;
+    }
+    .book-info .board {
+        padding: 10px;
     }
 </style>
