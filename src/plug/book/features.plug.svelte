@@ -5,7 +5,7 @@
     import * as MapFeature from "./features/map.feature.svelte";
     import * as SkillFeature from "./features/skill.feature.svelte";
     import * as TimelineFeature from "./features/timeline.feature.svelte";
-    import * as HelpFeature from "./features/help.feature.svelte";
+    import * as ConfigFeature from "./features/config.feature.svelte";
 
     const features = [
         EditorFeature,
@@ -14,7 +14,7 @@
         MapFeature,
         SkillFeature,
         TimelineFeature,
-        HelpFeature,
+        ConfigFeature,
     ];
 
     export const getTopFeatures = (keys = []) => {

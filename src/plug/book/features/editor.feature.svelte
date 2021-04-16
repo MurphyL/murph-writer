@@ -16,8 +16,23 @@
     <title>{`基础信息 - ${book.title || "未命名书籍"} - 书本详情`}</title>
 </svelte:head>
 
-<div class="info">
-    <pre>
-        <code>{ JSON.stringify(book, null, '  ') }</code>
-    </pre>
+<div class="editor">
+    <div class="instance"></div>
+    <div class="files"></div>
 </div>
+
+<style>
+    .editor {
+        display: flex;
+        min-height: 300px;
+        height: 100%;;
+        border: 1px solid #cfcfcf;
+    }
+    .editor .instance {
+        flex: 1;
+    }
+    .editor .files {
+        border-left: 1px solid #cfcfcf;
+        width: 300px;
+    }
+</style>

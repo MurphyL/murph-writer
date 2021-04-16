@@ -51,5 +51,9 @@
     }
     .book-info .board {
         padding: 10px;
+        height: calc(100% - 40px - 10px * 2);
+    }
+    .book-info .board .tab-body {
+        height: 100%;;
     }
 </style>
