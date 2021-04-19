@@ -28,7 +28,7 @@
                     {#each cols as { path, events, ...col }, ci}
                         <td data-column-index={ci} data-path={path}>
                             {#if col.component}
-                                <svelte:component this={col.component} {...col.props(pathGet(row, path), row)}/>
+                                <svelte:component this={col.component} {...col.props(pathGet(row, path) || row, row)}/>
                             {:else}
                                 {pathGet(row, path, "")}
                             {/if}

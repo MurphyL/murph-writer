@@ -71,7 +71,7 @@
     }, {
         label: '操作',
         component: ButtonGroup,
-        props: (values, { unique }) => ({ 
+        props: ({ unique }) => ({ 
             items: [{
                 text: '编辑',
                 click: (e) => { console.log('edit', unique, e); }
