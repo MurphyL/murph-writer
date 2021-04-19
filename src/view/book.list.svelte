@@ -48,42 +48,39 @@
             .catch(e => { alert(e.message) });
     };
 
-    const columns = [
-        {
-            label: '标题', 
-            path: 'title',
-            component: Link,
-            props: (value, { unique }) => {
-                return { text: value, url: `/books/${unique}` };
-            }
-        }, 
-        {
-            label: '可选特征', 
-            path: 'features', 
-            component: TagGroup,
-            props: (values) => { 
-                return { 
-                    items: values.map(item => ({ 
-                        text: features[item], url: `/features/${item}` 
-                    }))
-                };
-            }
-        }, 
-        {label: '备注', path: 'summary'}, 
-        {
-            label: '操作',
-            component: ButtonGroup,
-            props: (values, { unique }) => {
-                return { items: [{
-                    text: '编辑',
-                    click: (e) => { console.log('edit', unique, e); }
-                }, {
-                    text: '删除',
-                    click: () => { deleteBook(unique); }
-                }] };
-            }
-        }
-    ];
+    const columns = [{
+        label: '标题', 
+        path: 'title',
+        component: Link,
+        props: (value, { unique }) => ({ 
+            text: value, url: `/books/${unique}` 
+        })
+    }, {
+        label: '可选特征', 
+        path: 'features', 
+        component: TagGroup,
+        props: (values) => ({ 
+            items: values.map(item => ({ 
+                text: features[item], 
+                url: `/features/${item}` 
+            }))
+        })
+    }, {
+        label: '备注', 
+        path: 'summary'
+    }, {
+        label: '操作',
+        component: ButtonGroup,
+        props: (values, { unique }) => ({ 
+            items: [{
+                text: '编辑',
+                click: (e) => { console.log('edit', unique, e); }
+            }, {
+                text: '删除',
+                click: () => { deleteBook(unique); }
+            }] 
+        })
+    }];
 </script>
 
 <svelte:head>
