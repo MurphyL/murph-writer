@@ -1,7 +1,16 @@
 import cors from 'cors';
-import DataBase from 'nedb';
-import mkdirp from 'mkdirp';
 import express from 'express';
+
+import shelljs from 'shelljs';
+
+import lowdb from 'lowdb';
+import FileSync from 'lowdb/adapters/FileSync.js';
+
+const db = lowdb(new FileSync('public/res/db.json'));
+
+db.defaults({ books: [] })
+    .set('ts', Date.now())
+    .write();
 
 const app = express();
 const port = 3000;
@@ -11,101 +20,44 @@ app.use(cors());
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-mkdirp.sync('public/res');
-
-const store = new DataBase({
-    filename: 'public/res/meta.nedb',
-    autoload: true
-});
+shelljs.mkdir('-p', 'public/res');
 
 app.get('/:kind', (req, res) => {
-    store.find(req.params).sort({ sort: 1 }).limit(10).exec((err, docs) => {
-        if (err) {
-            console.error(err);
-            return res.json({
-                code: 1, message: '查询数据失败'
-            });
-        }
-        res.json({code: 0, payload: docs});
-    });
+    const docs = db.get(req.params.kind).take(10).value();
+    res.json({code: 0, payload: docs});
 });
 
 app.get('/:kind/:unique', (req, res) => {
-    store.findOne(req.params, function (err, doc) {
-        if (err) {
-            console.error(err);
-            return res.json({
-                code: 1, message: '查询数据失败'
-            });
-        }
-        res.json({code: 0, payload: doc});
-    });
+    const { params } = req;
+    const doc = db.get(params.kind).find(params).value();
+    res.json({code: 0, payload: doc});
 });
 
 
 app.delete('/:kind/:_id', (req, res) => {
-    store.remove({ ...req.params }, {}, function (err, count) {
-        if (err) {
-            return res.json({
-                code: 1, message: '数据删除失败'
-            });
-        }
-        res.json({code: 0, payload: { ...req.params, count } });
-    });
+    const { params } = req;
+    const doc = db.get(params.kind).remove(params).write();
+    res.json({code: 0, payload: { doc } });
 });
 
 app.post('/:kind', (req, res) => {
+    console.log(req.params.kind);
+    const collection = db.get(req.params.kind); 
     const { _id, ...item } = req.body;
     Object.assign(item, req.params);
     if(_id) {
-        store.update({ _id }, { $set: item }, {}, function (err, count) {
-            if (err) {
-                console.error(err);
-                return res.json({
-                    code: 1, message: '数据更新失败！'
-                });
-            }
-            res.send({ code: 0, payload: { _id, count } });
-        });
+        const count = collection.find({ _id }).assign(req.body).write();
+        res.send({ code: 0, payload: { _id, count } });
     } else {
         const ts = Date.now();
-        store.insert([{...item, sort: ts, ts}], function (err) {
-            if (err) {
-                console.error(err);
-                return res.json({
-                    code: 1, message: '数据插入失败！'
-                });
-            }
-            res.send({ code: 0 });
-        });
+        const doc = collection.push({...item, sort: ts, ts}).write()
+        res.send({ code: 0, payload: doc });
     }
 });
 
 app.post('/:kind/append', (req, res) => {
     const { kind } = req.params;
-    (req.body || []).forEach(({ _id, sort, content }) => {
-        const ts = Date.now();
-        if(_id) {
-            store.update({ _id }, { $set: { sort, ts } }, {}, (err) => {
-                if (err) {
-                    console.error(err);
-                    return res.json({
-                        code: 1, message: '数据更新失败！'
-                    });
-                }
-            });
-        } else {
-            store.insert([{ kind, content, ts, sort }], (err) => {
-                if (err) {
-                    console.error(err);
-                    return res.json({
-                        code: 1, message: '数据插入失败！'
-                    });
-                }
-            });
-        }
-    });
-    res.json({ code: 0 });
+    res.json({ code: 0, payload: { kind, type: 'append' } });
 });
 
 app.listen(port, () => {

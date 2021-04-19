@@ -1,0 +1,18 @@
+{
+  "books": [
+    {
+      "features": [
+        "map",
+        "skill",
+        "item"
+      ],
+      "unique": "1",
+      "title": "测试",
+      "summary": "1",
+      "kind": "books",
+      "sort": 1618827690525,
+      "ts": 1618827690525
+    }
+  ],
+  "ts": 1618827671983
+}

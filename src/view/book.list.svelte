@@ -3,6 +3,14 @@
 
     import { getSampleFeatures } from '../plug/book/features.plug.svelte';
 
+    import Loading from '../plug/extra/loading.plug.svelte';
+
+    import Link from '../plug/show/link/link.plug.svelte';
+    import Error from '../plug/show/error/error.plug.svelte';
+    import TagGroup from '../plug/show/tag/tag.group.svelte';
+    import DataTable from '../plug/show/data-table/data-table.plug.svelte';
+    import ButtonGroup from '../plug/show/button/button.group.svelte';
+
     let showCreate = false;
 
     let ts = Date.now();
@@ -39,6 +47,43 @@
             .then(createCancel)
             .catch(e => { alert(e.message) });
     };
+
+    const columns = [
+        {
+            label: '标题', 
+            path: 'title',
+            component: Link,
+            props: (value, { unique }) => {
+                return { text: value, url: `/books/${unique}` };
+            }
+        }, 
+        {
+            label: '可选特征', 
+            path: 'features', 
+            component: TagGroup,
+            props: (values) => { 
+                return { 
+                    items: values.map(item => ({ 
+                        text: features[item], url: `/features/${item}` 
+                    }))
+                };
+            }
+        }, 
+        {label: '备注', path: 'summary'}, 
+        {
+            label: '操作',
+            component: ButtonGroup,
+            props: (values, { unique }) => {
+                return { items: [{
+                    text: '编辑',
+                    click: (e) => { console.log('edit', unique, e); }
+                }, {
+                    text: '删除',
+                    click: () => { deleteBook(unique); }
+                }] };
+            }
+        }
+    ];
 </script>
 
 <svelte:head>
@@ -52,89 +97,17 @@
     </div>
     {#key ts}
         {#await ajax(['get', '/books'])}
-            <p>数据加载中……</p>
+            <Loading message="正在加载故事列表……" />
         {:then rows}
-            <table class="book-list">
-                <thead>
-                    <th width="10%">ID</th>
-                    <th width="10%">标题</th>
-                    <th width="10%">可选特征</th>
-                    <th width="10%">备注</th>
-                    <th width="10%">操作</th>
-                </thead>
-                <tbody>
-                    {#each rows as row, index}
-                        {#if params['_id'] !== row['_id']}
-                            <tr data-row-index={index}>
-                                <td>
-                                    <a href="/books/{ row.unique }" alt="书本详情">{ row.unique }</a>
-                                </td>
-                                <td>{ row.title }</td>
-                                <td>
-                                    <div class="features">
-                                        {#each getSampleFeatures(row.features) as feature, i }
-                                            <span class="feature">{feature.name}</span>
-                                        {/each}
-                                    </div>
-                                </td>
-                                <td>{ row.summary }</td>
-                                <td>
-                                    <button on:click={ () => { params = row; showCreate = true; } }>修改</button>
-                                    <button on:click={ () => deleteBook(row._id) }>删除</button>
-                                </td>
-                            </tr>
-                        {/if}
-                    {/each}
-                    {#if showCreate}
-                        <tr>
-                            <td>
-                                <input type="text" placeholder="英语名称" bind:value={params.unique}>
-                            </td>
-                            <td>
-                                <input type="text" placeholder="中文名称" bind:value={params.title}>
-                            </td>
-                            <td>
-                                {#each Object.entries(features) as [key, value], i }
-                                    <label for={key}>
-                                        <input id={key} type="checkbox" value={key}  bind:group={params.features} />
-                                        <span>{value}</span>
-                                    </label>
-                                {/each}
-                            </td>
-                            <td>
-                                <input type="text" placeholder="书本描述" bind:value={params.summary} />
-                            </td>
-                            <td>
-                                <button on:click={createBook}>保存</button>
-                                <button on:click={createCancel}>取消</button>
-                            </td>
-                        </tr>
-                    {/if}
-                </tbody>
-            </table>
+            <DataTable cols={columns} rows={rows || []} />
         {:catch error}
-            <p>数据加载出错：{error.message}</p>
+            <Error {error} />
         {/await}
     {/key}
 </div>
 <style>
-    .book-list {
-        margin: 10px 0;
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .book-list, .book-list td, .book-list th {
-        padding: 5px;
-        border: 1px solid black;
-        text-align: left;
-        line-height: 24px;
-    }
-    .book-list .features .feature {
-        margin: 0 3px;
-        padding: 3px 5px;
-        font-size: 12px;
-        border: 1px solid #cfcfcf;
-        border-radius: 3px;
-        user-select: none;
+    .books-view {
+        margin: 10px;
+        height: calc(100% - 10px * 2);
     }
 </style>
