@@ -1,0 +1,25 @@
+GET http://127.0.0.1:3000/api/db
+Accept: application/json
+
+###
+GET http://127.0.0.1:3001/api/hello/1
+
+###
+GET http://127.0.0.1:3000/api/hello
+
+###
+POST http://127.0.0.1:3000/api/hello
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{ "title": "hello-{{$guid}}", "author": "author-{{$guid}}" }
+
+###
+PUT http://127.0.0.1:3000/api/hello/2
+Accept: application/json
+Content-Type: application/json; charset=utf-8
+
+{ "title": "hello-{{$guid}}", "author": "author-{{$guid}}" }
+
+###
+DELETE http://127.0.0.1:3001/hello/13

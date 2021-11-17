@@ -1,0 +1,14 @@
+:global(body) {
+    height: 100vh;
+}
+
+:global(#root),
+.root {
+    height: 100%;
+}
+
+.root header a {
+    display: inline-block;
+    padding: 0 15px;
+    line-height: 30px;
+}

@@ -1,0 +1,32 @@
+body, code {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-feature-settings: "tnum";
+    font-variant: tabular-nums;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: blue orange;
+}
+
+/* Works on Chrome/Edge/Safari */
+*::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+*::-webkit-scrollbar-track {
+	background: orange rgba(241, 241, 241, 1);
+}
+*::-webkit-scrollbar-thumb {
+	background-color: rgba(193, 193, 193, 1);
+	border-radius: 20px;
+	border: 1px solid  rgba(192, 192, 192, 1);
+}
+
+
+:root {
+	--view-width: 960px;
+	--shadow-color: rgba(0, 0, 0, 0.1);
+	--toolbar-color: white;
+}

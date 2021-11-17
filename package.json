@@ -1,0 +1,44 @@
+{
+  "name": "murph-writer",
+  "version": "1.0.0",
+  "description": "story writer",
+  "main": "index.js",
+  "scripts": {
+    "restify": "nohup node restify/index.js >/dev/null 2>&1 &",
+    "prestart": "npm run restify",
+    "start": "react-scripts start"
+  },
+  "keywords": [
+    "Writer"
+  ],
+  "author": "murph",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-helmet-async": "^1.1.2",
+    "react-router-dom": "^6.0.2",
+    "recoil": "^0.5.2"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "json-server": "^0.17.0",
+    "react-scripts": "^4.0.3"
+  },
+  "proxy": "http://localhost:3001"
+}
