@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import { selectorFamily, useRecoilValue } from 'recoil';
 
 import { Helmet } from 'react-helmet-async';
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import axios from 'axios';
 
@@ -11,7 +11,7 @@ import styles from './collection.module.css';
 export const fetchCollection = selectorFamily({
     key: 'fetch-collection',
     get: (unique) => async () => {
-        const { data, status } = await axios.get(`/api/${unique}`);
+        const { data, status } = await axios.get(`/api/${unique}/_desc`);
         if (status === 200) {
             return data;
         } else {

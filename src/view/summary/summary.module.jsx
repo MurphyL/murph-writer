@@ -11,7 +11,7 @@ import styles from './summary.module.css';
 export const dbSummary = selector({
     key: 'db-summary',
     get: () => {
-        return axios.get('/api/db').then(({ status, data }) => {
+        return axios.get('/api/_desc').then(({ status, data }) => {
             return status === 200 ? data : null;
         }).catch(err => {
             console.error('Github API 调用出错：', err.message);
@@ -23,7 +23,7 @@ export const dbSummary = selector({
 });
 
 function Summary() {
-    const summary = useRecoilValue(dbSummary);
+    const databases = useRecoilValue(dbSummary);
     return (
         <div className={styles.root}>
             <table>
@@ -35,11 +35,9 @@ function Summary() {
                     </tr>
                 </thead>
                 <tbody>
-                    {Object.entries(summary).map(([key, value]) => (
-                        <tr key={key}>
-                            <td><Link to={`/collections/${key}`}>{key}</Link></td>
-                            <td>{Array.isArray(value) ? 'collection' : typeof (value)}</td>
-                            <td>{(Array.isArray(value) ? value : Object.values(value)).length}</td>
+                    {(databases || []).map(({name}, index) => (
+                        <tr key={index}>
+                            <td><Link to={`/collections/${name}`}>{name}</Link></td>
                         </tr>
                     ))}
                 </tbody>
