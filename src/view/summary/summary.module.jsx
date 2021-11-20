@@ -1,17 +1,18 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { selector, useRecoilValue } from 'recoil';
 
-import { Helmet } from 'react-helmet-async';
 import { Link } from "react-router-dom";
 
 import axios from 'axios';
 
+import CreateToolbar from 'plug/toolbar/create-toolbar.module';
+
 import styles from './summary.module.css';
 
-export const dbSummary = selector({
-    key: 'db-summary',
+export const summary = selector({
+    key: 'restify-summary',
     get: () => {
-        return axios.get('/api/_desc').then(({ status, data }) => {
+        return axios.get('/api/_cat').then(({ status, data }) => {
             return status === 200 ? data : null;
         }).catch(err => {
             console.error('Github API 调用出错：', err.message);
@@ -22,22 +23,38 @@ export const dbSummary = selector({
     }
 });
 
-function Summary() {
-    const databases = useRecoilValue(dbSummary);
+export default function Summary() {
+    const databases = useRecoilValue(summary);
+    const createDatabase = (id) => {
+        axios.post(`/api/${id}/_schema`, {
+            create: 'id',
+            type: 'database'
+        })
+    };
+    const dropDatabase = (id) => {
+        if(window.confirm(`确定要删除数据库【${id}】吗？`)) {
+            axios.delete(`/api/${id}/_schema`);
+        }
+    };
     return (
         <div className={styles.root}>
+            <CreateToolbar name="数据库" submit={createDatabase} />
             <table>
                 <thead>
                     <tr>
-                        <th>Object</th>
-                        <th>Type</th>
-                        <th>Size</th>
+                        <th>Database</th>
+                        <th>Modified</th>
+                        <th>Options</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {(databases || []).map(({name}, index) => (
+                    {(databases || []).map(({ name, ct, mt }, index) => (
                         <tr key={index}>
-                            <td><Link to={`/collections/${name}`}>{name}</Link></td>
+                            <td><Link to={`/${name}/collections`}>{name}</Link></td>
+                            <td>{ct || mt}</td>
+                            <td>
+                                <button onClick={() => dropDatabase(name)}>删除</button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>
@@ -45,14 +62,3 @@ function Summary() {
         </div>
     );
 };
-
-export default function Board() {
-    return (
-        <Suspense fallback="loading……">
-            <Helmet>
-                <title>摘要 - {process.env.REACT_APP_TITLE}</title>
-            </Helmet>
-            <Summary />
-        </Suspense>
-    );
-}
