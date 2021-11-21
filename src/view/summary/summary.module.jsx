@@ -26,14 +26,14 @@ export const summary = selector({
 export default function Summary() {
     const { schemas } = useRecoilValue(summary);
     const createDatabase = (id) => {
-        axios.post(`/api/${id}/_schema`, {
+        axios.post(`/api/_create/${id}`, {
             create: 'id',
             type: 'database'
         })
     };
     const dropDatabase = (id) => {
         if(window.confirm(`确定要删除数据库【${id}】吗？`)) {
-            axios.delete(`/api/${id}/_schema`);
+            axios.delete(`/api/_drop/${id}`);
         }
     };
     return (

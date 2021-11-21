@@ -39,7 +39,7 @@ exports.create_schema = ({ schema }, { settings }) => {
     const file = path.resolve(root, `${schema}${DB_SUFFIX}`);
     const result = { action: 'create schema', unique: schema };
     if (fs.existsSync(file)) {
-        return { ...result, status: 'schema exists' };
+        return { ...result, status: false, message: 'schema exists' };
     }
     jsonfile.writeFileSync(file, {
         _id: uuid.v4(),
@@ -48,7 +48,7 @@ exports.create_schema = ({ schema }, { settings }) => {
     });
     return {
         ...result,
-        status: 'schema created'
+        status: true
     }
 };
 
@@ -57,7 +57,7 @@ exports.drop_schema = ({ schema }) => {
     fs.unlinkSync(path.resolve(root, `${schema}${DB_SUFFIX}`));
     return {
         ...result,
-        status: 'schema droped'
+        status: true
     }
 };
 
@@ -65,7 +65,7 @@ exports.show_collections = ({ schema, pattern }) => {
     const file = path.resolve(root, `${schema}${DB_SUFFIX}`);
     const result = { action: 'show collections', unique: schema };
     if (!fs.existsSync(file)) {
-        return { ...result, status: 'schema not exists' };
+        return { ...result, status: false, message: 'schema not exists' };
     }
     const { ctime } = fs.lstatSync(file);
     const values = jsonfile.readFileSync(file);
@@ -81,35 +81,51 @@ exports.show_collections = ({ schema, pattern }) => {
     }
 };
 
-exports.create_collection = ({ schema }, { collection, settings }) => {
+exports.create_collection = ({ schema, collection }, { settings }) => {
     const file = path.resolve(root, `${schema}${DB_SUFFIX}`);
     const result = { action: 'create collection', unique: `${schema}/${collection}` };
     if (!fs.existsSync(file)) {
-        return { ...result, status: 'schema not exists' };
+        return { ...result, status: false, message: 'schema not exists' };
     }
     const database = jsonfile.readFileSync(file);
     const values = Object.assign(database, {
         _collections: [...database._collections, {
             _id: uuid.v4(),
+            _ts: dayjs().format(TS_FORMAT),
             _name: collection,
             _settings: Object.assign({}, settings)
         }]
     });
     jsonfile.writeFileSync(file, values, { spaces: 4 });
-    return { ...result, status: 'collection created' };
+    return { ...result, status: true };
 };
 
 exports.search_collection = ({ schema, collection }) => {
     const file = path.resolve(root, `${schema}${DB_SUFFIX}`);
-    const result = { type: 'collection', unique: `${schema}/${collection}` };
+    const result = { action: 'search collection', unique: `${schema}/${collection}` };
     if (!fs.existsSync(file)) {
-        return { ...result, status: 'schema not exists' };
+        return { ...result, status: false, message: 'schema not exists' };
     }
     const { _collections = [] } = jsonfile.readFileSync(file);
     const target = _collections.find(({ _name }) => _name === collection);
     if (target) {
         return { ...result, rows: target.rows };
     } else {
-        return { ...result, status: 'collection not exists' };
+        return { ...result, status: false, message: 'collection not exists' };
+    }
+};
+
+exports.drop_collection = ({ schema, collection }) => {
+    const file = path.resolve(root, `${schema}${DB_SUFFIX}`);
+    const result = { action: 'drop collection', unique: `${schema}/${collection}` };
+    if (!fs.existsSync(file)) {
+        return { ...result, status: false, message: 'schema not exists' };
+    }
+    const { _collections = [] } = jsonfile.readFileSync(file);
+    const target = _collections.find(({ _name }) => _name === collection);
+    if (target) {
+        return { ...result, status: false, message: 'no impl' };
+    } else {
+        return { ...result, status: false, message: 'collection not exists' };
     }
 };

@@ -9,10 +9,10 @@ import CreateToolbar from 'plug/toolbar/create-toolbar.module';
 
 import styles from './collections.module.css';
 
-const showCollection = selectorFamily({
+const showCollections = selectorFamily({
     key: 'show-collections',
     get: (unique) => async () => {
-        const { data, status } = await axios.get(`/api/${unique}/_collections`);
+        const { data, status } = await axios.get(`/api/_cat/${unique}`);
         if (status === 200) {
             return data;
         } else {
@@ -24,7 +24,7 @@ const showCollection = selectorFamily({
 const searchCollection = selectorFamily({
     key: 'search-collection',
     get: ({ database, collection }) => async () => {
-        const { data, status } = await axios.get(`/api/${database}/${collection}/_search`);
+        const { data, status } = await axios.get(`/api/_cat/${database}/${collection}`);
         if (status === 200) {
             return data;
         } else {
@@ -34,7 +34,7 @@ const searchCollection = selectorFamily({
 });
 
 const createCollection = (database, unique) => {
-    axios.post(`/api/${database}/_collections`, {
+    axios.post(`/api/_create/${database}/${unique}`, {
         collection: unique,
         type: 'database'
     })
@@ -42,7 +42,12 @@ const createCollection = (database, unique) => {
 
 export function Collections() {
     const { database } = useParams();
-    const { collections = [] } = useRecoilValue(showCollection(database));
+    const { collections = [] } = useRecoilValue(showCollections(database));
+    const dropCollection = (id) => {
+        if(window.confirm(`确定要删除数据集【${database}/${id}】吗？`)) {
+            axios.delete(`/api/_drop/${database}/${id}`);
+        }
+    };
     return (
         <div className={styles.root}>
             <CreateToolbar name="集合" submit={(unique) => createCollection(database, unique)} />
@@ -60,9 +65,9 @@ export function Collections() {
                             <td>
                                 <Link to={`/${database}/collections/${row._name}/_search`}>{row._name}</Link>
                             </td>
-                            <td>{row.ct}</td>
+                            <td>{row._ts}</td>
                             <td>
-                                <button>删除</button>
+                                <button onClick={() => dropCollection(row._name)}>删除</button>
                             </td>
                         </tr>
                     ))}
@@ -75,5 +80,9 @@ export function Collections() {
 export function Collection() {
     const rows = useRecoilValue(searchCollection(useParams()));
     console.log(rows);
-    return 'x - collection';
+    return (
+        <div className={styles.root}>
+            <CreateToolbar name="集合" submit={(unique) => console.log(unique)} />
+        </div>
+    );
 }
