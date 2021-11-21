@@ -25,23 +25,27 @@ app.use(async (ctx, next) => {
 });
 
 router.get('/_cat', (ctx) => {
-    ctx.body = db.show_databases();
+    ctx.body = db.show_schemas();
 });
 
 router.post('/:schema/_schema', (ctx) => {
-    ctx.body = db.create_database(ctx.params, ctx.request.body);
+    ctx.body = db.create_schema(ctx.params, ctx.request.body);
 });
 
 router.del('/:schema/_schema', (ctx) => {
-    ctx.body = db.drop_database(ctx.params);
+    ctx.body = db.drop_schema(ctx.params);
 });
 
 router.get('/:schema/_collections', (ctx) => {
-    ctx.body = db.show_tables(ctx.params);
+    ctx.body = db.show_collections(ctx.params);
 });
 
 router.post('/:schema/_collections', (ctx) => {
-    ctx.body = db.create_table(ctx.params, ctx.request.body);
+    ctx.body = db.create_collection(ctx.params, ctx.request.body);
+});
+
+router.get('/:schema/:collection/_search', (ctx) => {
+    ctx.body = db.search_collection(ctx.params);
 });
 
 app.use(logger());

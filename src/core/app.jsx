@@ -20,7 +20,7 @@ const Views = () => useRoutes([{
         path: ':database/collections',
         element: <DynamicModule title="集合"><Collections /></DynamicModule>,
     }, {
-        path: ':database/collections/:collection/_doc',
+        path: ':database/collections/:collection/_search',
         element: <DynamicModule title="数据"><Collection /></DynamicModule>,
     }, {
         path: '*',

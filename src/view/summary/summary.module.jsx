@@ -24,7 +24,7 @@ export const summary = selector({
 });
 
 export default function Summary() {
-    const databases = useRecoilValue(summary);
+    const { schemas } = useRecoilValue(summary);
     const createDatabase = (id) => {
         axios.post(`/api/${id}/_schema`, {
             create: 'id',
@@ -48,7 +48,7 @@ export default function Summary() {
                     </tr>
                 </thead>
                 <tbody>
-                    {(databases || []).map(({ name, ct, mt }, index) => (
+                    {(schemas || []).map(({ name, ct, mt }, index) => (
                         <tr key={index}>
                             <td><Link to={`/${name}/collections`}>{name}</Link></td>
                             <td>{ct || mt}</td>

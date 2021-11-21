@@ -9,10 +9,22 @@ import CreateToolbar from 'plug/toolbar/create-toolbar.module';
 
 import styles from './collections.module.css';
 
-export const fetchCollection = selectorFamily({
-    key: 'fetch-collection',
+const showCollection = selectorFamily({
+    key: 'show-collections',
     get: (unique) => async () => {
         const { data, status } = await axios.get(`/api/${unique}/_collections`);
+        if (status === 200) {
+            return data;
+        } else {
+            return null;
+        }
+    }
+});
+
+const searchCollection = selectorFamily({
+    key: 'search-collection',
+    get: ({ database, collection }) => async () => {
+        const { data, status } = await axios.get(`/api/${database}/${collection}/_search`);
         if (status === 200) {
             return data;
         } else {
@@ -30,7 +42,7 @@ const createCollection = (database, unique) => {
 
 export function Collections() {
     const { database } = useParams();
-    const { collections = [] } = useRecoilValue(fetchCollection(database));
+    const { collections = [] } = useRecoilValue(showCollection(database));
     return (
         <div className={styles.root}>
             <CreateToolbar name="集合" submit={(unique) => createCollection(database, unique)} />
@@ -46,7 +58,7 @@ export function Collections() {
                     {(collections || []).map((row, index) => (
                         <tr key={index}>
                             <td>
-                                <Link to={`/${database}/collections/${row._name}/_doc`}>{row._name}</Link>
+                                <Link to={`/${database}/collections/${row._name}/_search`}>{row._name}</Link>
                             </td>
                             <td>{row.ct}</td>
                             <td>
@@ -61,6 +73,7 @@ export function Collections() {
 };
 
 export function Collection() {
-    const { database } = useParams();
-    return (database);
+    const rows = useRecoilValue(searchCollection(useParams()));
+    console.log(rows);
+    return 'x - collection';
 }
