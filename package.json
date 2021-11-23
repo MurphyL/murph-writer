@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "story writer",
   "main": "index.js",
+  "restify": {
+    "version": "0.0.1"
+  },
   "scripts": {
-    "restify": "nohup node restify/index.js >/dev/null 2>&1 &",
+    "restify": "nohup node restify/restify.js > /var/log/restify.log 2>&1 &",
     "prestart": "npm run restify",
     "start": "react-scripts start"
   },
@@ -14,7 +17,10 @@
   "author": "murph",
   "license": "MIT",
   "dependencies": {
+    "ajv": "^8.8.1",
     "axios": "^0.24.0",
+    "dayjs": "^1.10.7",
+    "koa-trie-router": "^2.1.7",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-helmet-async": "^1.1.2",
@@ -37,8 +43,13 @@
     ]
   },
   "devDependencies": {
-    "json-server": "^0.17.0",
-    "react-scripts": "^4.0.3"
+    "@koa/router": "^10.1.1",
+    "jsonfile": "^6.1.0",
+    "koa": "^2.13.4",
+    "koa-body": "^4.2.0",
+    "koa-logger": "^3.2.1",
+    "koa-static": "^5.0.0",
+    "react-scripts": "^3.4.4"
   },
   "proxy": "http://localhost:3001"
 }

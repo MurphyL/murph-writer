@@ -1,4 +1,6 @@
 build/
 node_modules/
 
+restify/demo/
+
 package-lock.json

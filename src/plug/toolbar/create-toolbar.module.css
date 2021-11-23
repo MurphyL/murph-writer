@@ -1,0 +1,22 @@
+.root {
+    margin: 0 5px;
+    padding-left: 15px;
+    line-height: 30px;
+    border-left: 5px solid rgba(180, 180, 180, 0.8);
+}
+
+.root input {
+    margin: 0;
+    padding: 0 5px;
+    height: 24px;
+    outline: none;
+}
+
+.root button {
+    margin-left: 5px;
+    height: 28px;
+}
+
+.root .message {
+    margin-left: 5px;
+}
