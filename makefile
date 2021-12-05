@@ -1,11 +1,12 @@
+restify_port:=8080
 service_port:=3000
-restify_port:=3001
+mongodb_port:=27017
 
-start:
-	docker run --name murph-writer --rm -it -v $(CURDIR):/usr/murph -p $(restify_port):3000 -e RESTIFY_API_PREFIX=/api murphyl/nodejs:latest npm run start
+start: restify
+	docker run --name murph-writer-service --rm -it -v $(CURDIR):/usr/murph -p $(service_port):3000 -e REACT_APP_ENDPOINT=http://127.0.0.1:${restify_port} murphyl/nodejs:latest npm run start
 
-rest:
-	docker run --name murph-writer --rm -it -v $(CURDIR):/usr/murph -p $(restify_port):3001 murphyl/nodejs:latest npm run restify
+vm: restify
+	docker run --name murph-writer-service --rm -it -v $(CURDIR):/usr/murph -p $(service_port):3000 -e REACT_APP_ENDPOINT=http://127.0.0.1:${restify_port} murphyl/nodejs:latest 
 
-vm:
-	docker run --name murph-writer --rm -it -v $(CURDIR):/usr/murph -p $(restify_port):3000 -e RESTIFY_API_PREFIX=/api murphyl/nodejs:latest 
+restify:
+	- docker run --name murph-writer-restify --rm -d -v $(CURDIR)/data:/usr/murph/mongo/data -p ${restify_port}:8080 -e RH_DATABASE=murph_x  -p $(mongodb_port):27017 murphyl/rest-mongo

@@ -7,8 +7,6 @@
     "version": "0.0.1"
   },
   "scripts": {
-    "restify": "nohup node restify/restify.js > /var/log/restify.log 2>&1 &",
-    "prestart": "npm run restify",
     "start": "react-scripts start"
   },
   "keywords": [
@@ -50,6 +48,5 @@
     "koa-logger": "^3.2.1",
     "koa-static": "^5.0.0",
     "react-scripts": "^3.4.4"
-  },
-  "proxy": "http://localhost:3001"
+  }
 }
